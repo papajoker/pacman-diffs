@@ -24,19 +24,11 @@ bold='\033[1m'
         ['erase']='You can erase this file'
         ['archiver']='archive in'
     )
-lg=$(locale 2>/dev/null | awk -F'=' '/^LANG/ {print $2}')
-if [ 'fr' == "${lg:0:2}" ]; then
-    declare -A txt=(
-        ['label']='les différences de'
-        ['error']='Erreur'
-        ['notfound']="fichier n'existe pas"
-        ['root']='Vous devez avoir des droits administrateur'
-        ['files']='fichiers'
-        ['noarchive']='non archivés'
-        ['erase']='Vous pouvez supprimer ce fichier'
-        ['archiver']='archivé dans'
-    )
-fi
+lg=$(locale 2>/dev/null | awk -F'=' '/^LANG/ {print $2}')    
+dico="/usr/share/locale/$lg/LC_MESSAGES/$pkgname"    
+if [ -f "$dico" ]; then
+    . "$dico";
+fi    
 #}}}
 
 function error()

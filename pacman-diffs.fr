@@ -1,0 +1,10 @@
+declare -A txt=(
+        ['label']='les différences de'
+        ['error']='Erreur'
+        ['notfound']="fichier n'existe pas"
+        ['root']='Vous devez avoir des droits administrateur'
+        ['files']='fichiers'
+        ['noarchive']='non archivés'
+        ['erase']='Vous pouvez supprimer ce fichier'
+        ['archiver']='archivé dans'
+)
