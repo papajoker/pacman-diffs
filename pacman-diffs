@@ -26,7 +26,6 @@ bold='\033[1m'
     )
     lg=$(locale 2>/dev/null | awk -F'=' '/^LANG/ {print $2}')    
     dico="/usr/share/locale/${lg:0:2}/LC_MESSAGES/$pkgname"  
-    echo $dico
     if [ -f "$dico" ]; then
         . "$dico";
     fi    
