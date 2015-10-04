@@ -2,7 +2,7 @@
 # finding .pacnew files and compare
 # v1.1.0
 
-
+pkgname='pacman-diffs'
 AGE=360 # ne rechercher que ceux qui ont moins de 360 jours
 EXT='pacnew'
 ARCCHIVEDIR='/var/cache/pacman/pacnew'
@@ -24,11 +24,12 @@ bold='\033[1m'
         ['erase']='You can erase this file'
         ['archiver']='archive in'
     )
-lg=$(locale 2>/dev/null | awk -F'=' '/^LANG/ {print $2}')    
-dico="/usr/share/locale/$lg/LC_MESSAGES/$pkgname"    
-if [ -f "$dico" ]; then
-    . "$dico";
-fi    
+    lg=$(locale 2>/dev/null | awk -F'=' '/^LANG/ {print $2}')    
+    dico="/usr/share/locale/${lg:0:2}/LC_MESSAGES/$pkgname"  
+    echo $dico
+    if [ -f "$dico" ]; then
+        . "$dico";
+    fi    
 #}}}
 
 function error()
