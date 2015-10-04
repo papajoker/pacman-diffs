@@ -1,0 +1,23 @@
+# pacman-diffs plugins
+
+[php.ini]
+txt=php config, dont use if minor version
+fr=configuration de php, ne pas tenir compte si maj mineure
+url=http://php.net
+exe=ls
+
+[yaourtrc]
+txt=configuration pour yaourt, utiliser plutot ~/yaourtrc
+url=https://github.com/archlinuxfr/yaourt
+exe=pacman -Q | grep "yaourt"
+
+[mirrorlist]
+txt= ne pas tenir compte du fichier et exécuter reflector à la place
+exe= reflector --verbose --country France -l 5 -p http --sort rate --save /etc/pacman.d/mirrorlist && rm /etc/pacman.d/mirrorlist.pacnew
+
+[locale.gen]
+txt= ne pas tenir compte, suppression automatique
+exe= rm  /etc/locale.gen.pacnew
+
+[ntp]
+url= https://wiki.archlinux.org/index.php/Network_Time_Protocol_daemon#Configuration

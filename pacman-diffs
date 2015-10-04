@@ -23,9 +23,11 @@ bold='\033[1m'
         ['noarchive']='not in archives'
         ['erase']='You can erase this file'
         ['archiver']='archive in'
+        ['view']='voir'
     )
     lg=$(locale 2>/dev/null | awk -F'=' '/^LANG/ {print $2}')    
-    dico="/usr/share/locale/${lg:0:2}/LC_MESSAGES/$pkgname"  
+    lg=${lg:0:2}
+    dico="/usr/share/locale/${lg}/LC_MESSAGES/$pkgname"  
     if [ -f "$dico" ]; then
         . "$dico";
     fi    
@@ -89,12 +91,57 @@ function in_archive(){
     fi
 }
 
+function read_ini(){
+    local file="$1"
+    local key="$2"
+    local context=''
+    while read line ; do
+        echo $line | grep -qE '^(#|$)' && continue
+        if [ $line == "[$key]" ] ; then
+            context=$(echo $line | tr -d '[]')
+            continue
+        fi
+        [[ $context != '' && ${line:0:1} == '[' ]] && return 0
+        if [[ $context != '' ]]; then
+            echo "$line"
+        fi
+    done < "$file"
+}
+function run_plugin(){
+    local key="$1"
+    local out=$(read_ini "/etc/$pkgname.plugins" "$key")
+    if [ -n "$out" ]; then
+        echo "-------- plugin --------"
+        # locale text first with $lg if exist
+        local text=$(echo "$out" | awk -F'=' '/^'$lg'/ {print $2}')
+        if [ -n "$text" ]; then
+            echo -e "$c_yellow${text}$c_end"
+        else
+            text=$(echo "$out" | awk -F'=' '/^txt/ {print $2}')
+            if [ -n "$text" ]; then
+                echo -e "$c_yellow${text}$c_end"
+            fi
+        fi
+        local url=$(echo "$out" | awk -F'=' '/^url/ {print $2}')
+        if [ -n "$url" ]; then
+            echo -e "${txt[view]}\t${url}"
+        fi
+        local exec=$(echo "$out" | awk -F'=' '/^exe/ {print $2}')
+        if [ -n "$exec" ]; then
+            echo ">$exec"
+            eval "$exec"
+        fi
+        echo "-------- plugin --------"
+    fi
+}
+
 function make_diff()
 #TODO : test permission et faire sudo si besoin ou test_sudo() ?
 {
     local file1="$1"
     local file2="$2"
-    local original="$3"
+    local key="$3"
+    local original="$4"
     if [[ $(diff $file1 $file2|wc -l) -eq 0 ]]; then
         # can remove etc/pacnew
         echo -e "-- ${c_yellow}${txt[erase]}${c_end} : sudo rm $original"
@@ -104,7 +151,9 @@ function make_diff()
         diff $file1 $file2| grep -E "^>|^<" | while read line ; do
             if [ "${line::1}" = '<' ]; then c="$c_red-"; else c="$c_green+"; fi
             echo -e "$c ${line:2}$c_end"
-        done    
+        done   
+        # find plugin
+        run_plugin "$key"
     fi
 }
 
@@ -159,7 +208,7 @@ find '/etc' -name "*.$EXT" -mtime -$AGE -type f 2> /dev/null | while read file ;
     dfile=$(stat -c "%y" ${file} | awk '{print $1}')
     echo -e "\n$bold${fname}$c_end\n-- ${txt[label]} $file\t(${dfile})"
    
-    if [[ -f "$ofile" ]]; then
+    if [ -f "$ofile" ]; then
     
         if [[ $archive -eq 1 ]]; then
             # cp in  /var/cache/pacman/pacnew/
@@ -171,8 +220,8 @@ find '/etc' -name "*.$EXT" -mtime -$AGE -type f 2> /dev/null | while read file ;
         
             if [[ $archivediff -eq 1 ]]; then
                 files=$(in_archive ${file} ${fname})
-                if [ "$?" -ne "1" ]; then
-                        make_diff ${files} ${file}
+                if [[ "$?" -ne "1" ]]; then
+                        make_diff ${files} ${file} ${fname}
                         continue
                 else
                     echo "2 ${txt[files]} \"${fname}\" ${txt[noarchive]}"
@@ -180,7 +229,7 @@ find '/etc' -name "*.$EXT" -mtime -$AGE -type f 2> /dev/null | while read file ;
                 fi                
             fi
             
-            make_diff ${ofile} ${file} ${file}
+            make_diff ${ofile} ${file} ${fname} ${file}
         fi
     
         if [ "$edit" == "$fname" ]; then

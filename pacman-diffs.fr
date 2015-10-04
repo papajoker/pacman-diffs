@@ -7,4 +7,5 @@ declare -A txt=(
         ['noarchive']='non archivés'
         ['erase']='Vous pouvez supprimer ce fichier'
         ['archiver']='archivé dans'
+        ['view']='voir'
 )
