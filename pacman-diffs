@@ -109,7 +109,7 @@ function read_ini(){
 }
 function run_plugin(){
     local key="$1"
-    local out=$(read_ini "/etc/pacman.d/$pkgname.config" "$key")
+    local out=$(read_ini "/etc/pacman.d/$pkgname.conf" "$key")
     if [ -n "$out" ]; then
         echo "-------- plugin --------"
         # locale text first with $lg if exist
