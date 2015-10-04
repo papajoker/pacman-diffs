@@ -1,6 +1,6 @@
 # pacman-diffs
 
-![](http://âpp.com/dl/Hgq8)
+![](http://xn--pp-oia.com/dl/Hgq8)
 
 ## Installation
 With AUR :
