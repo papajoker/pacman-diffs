@@ -54,12 +54,36 @@ function get_su(){
     echo -n "$mysu"
 }
 
+function read_ini(){
+    local file="$1"
+    local key="$2"
+    local context=''
+    while read line ; do
+        echo $line | grep -qE '^(#|$)' && continue
+        if [[ $line == "[$key]" ]] ; then
+            context=$(echo $line | tr -d '[]')
+            continue
+        fi
+        [[ $context != '' && ${line:0:1} == '[' ]] && return 0
+        if [[ $context != '' ]]; then
+            echo "$line"
+        fi
+    done < "$file"
+}
+
 function get_editor(){
-    local ed=''
-    if [ -f '/usr/bin/kompare' ]; then
-        ed='/usr/bin/kompare'
+    local out=$(read_ini "/etc/pacman.d/$pkgname.conf" "pacman-diffs")
+    local ed=$(echo "$out" | awk -F'=' '/^edit/ {print $2}')
+    ed=${ed// /}
+    if [[ -n "$ed" && -f "/bin/$ed" ]]; then
+        echo "$ed"
+        exit
+    fi
+    ed=''
+    if [ -f '/usr/bin/diffuse' ]; then
+        ed='/usr/bin/diffuse'
     else
-        [ -f '/usr/bin/diffuse' ] && ed='/usr/bin/diffuse'
+        [ -f '/usr/bin/kompare' ] && ed='/usr/bin/kompare'
     fi
     echo "$ed"
 }
@@ -91,22 +115,6 @@ function in_archive(){
     fi
 }
 
-function read_ini(){
-    local file="$1"
-    local key="$2"
-    local context=''
-    while read line ; do
-        echo $line | grep -qE '^(#|$)' && continue
-        if [ $line == "[$key]" ] ; then
-            context=$(echo $line | tr -d '[]')
-            continue
-        fi
-        [[ $context != '' && ${line:0:1} == '[' ]] && return 0
-        if [[ $context != '' ]]; then
-            echo "$line"
-        fi
-    done < "$file"
-}
 function run_plugin(){
     local key="$1"
     local out=$(read_ini "/etc/pacman.d/$pkgname.conf" "$key")
