@@ -206,7 +206,7 @@ find '/etc' -name "*.$EXT" -mtime -$AGE -type f 2> /dev/null | while read file ;
     fname="${fname%.$EXT}"
     ofile="$(dirname ${file})/${fname}"
     dfile=$(stat -c "%y" ${file} | awk '{print $1}')
-    echo -e "\n$bold${fname}$c_end\n-- ${txt[label]} $file\t(${dfile})"
+    [ -z "$edit" ] && echo -e "\n$bold${fname}$c_end\n-- ${txt[label]} $file\t(${dfile})"
    
     if [ -f "$ofile" ]; then
     
@@ -233,8 +233,8 @@ find '/etc' -name "*.$EXT" -mtime -$AGE -type f 2> /dev/null | while read file ;
         fi
     
         if [ "$edit" == "$fname" ]; then
-            cmd="$(get_su) $(get_editor) $ofile $file"
-            $cmd
+            $(get_su) $(get_editor) $file $ofile 1> /dev/null
+            exit 0
         fi
     
     else
