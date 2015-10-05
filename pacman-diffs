@@ -56,10 +56,10 @@ function get_su(){
 
 function get_editor(){
     local ed=''
-    if [ -f '/usr/bin/diffuse' ]; then
-        ed='/usr/bin/diffuse'
+    if [ -f '/usr/bin/kompare' ]; then
+        ed='/usr/bin/kompare'
     else
-        [ -f '/usr/bin/kompare' ] && ed='/usr/bin/kompare'
+        [ -f '/usr/bin/diffuse' ] && ed='/usr/bin/diffuse'
     fi
     echo "$ed"
 }
@@ -233,7 +233,7 @@ find '/etc' -name "*.$EXT" -mtime -$AGE -type f 2> /dev/null | while read file ;
         fi
     
         if [ "$edit" == "$fname" ]; then
-            cmd="$(get_su) $(get_editor) $ofile $file &"
+            cmd="$(get_su) $(get_editor) $ofile $file"
             $cmd
         fi
     
