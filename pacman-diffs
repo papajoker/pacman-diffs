@@ -88,7 +88,7 @@ function get_editor(){
     echo "$ed"
 }
 
-function archive()
+function archiver()
 {
     test_sudo
     local file="$1"
@@ -119,7 +119,7 @@ function run_plugin(){
     local key="$1"
     local out=$(read_ini "/etc/pacman.d/$pkgname.conf" "$key")
     if [ -n "$out" ]; then
-        echo "-------- plugin --------"
+        echo "----------------"
         # locale text first with $lg if exist
         local text=$(echo "$out" | awk -F'=' '/^'$lg'/ {print $2}')
         if [ -n "$text" ]; then
@@ -139,7 +139,7 @@ function run_plugin(){
             echo ">$exec"
             eval "$exec"
         fi
-        echo "-------- plugin --------"
+        echo "---------------"
     fi
 }
 
@@ -171,7 +171,7 @@ function history_pacman()
     if [ "$history" -gt "0" ]; then
         grep "pacnew$" /var/log/pacman.log | sed -e "s/\[ALPM\] warning: //"
     else
-        grep "pacnew$" /var/log/pacman.log| awk '{print $8}' | sort | uniq
+        grep "pacnew$" /var/log/pacman.log | awk '{print $8}' | sort | uniq
     fi
 }
 
@@ -190,6 +190,8 @@ function usage()
 }
 
 ############## RUN ##############
+
+unset archive listing edit archivediff
 
 while getopts "hd:x:le:acij" flags; do
 	case $flags in
@@ -218,15 +220,15 @@ find '/etc' -name "*.$EXT" -mtime -$AGE -type f 2> /dev/null | while read file ;
    
     if [ -f "$ofile" ]; then
     
-        if [[ $archive -eq 1 ]]; then
+        if ((archive)); then
             # cp in  /var/cache/pacman/pacnew/
-            archive ${file} ${fname}
+            archiver ${file} ${fname}
         fi
         
  
-        if [[ $listing -ne 1 ]]; then
+        if ((!listing)); then
         
-            if [[ $archivediff -eq 1 ]]; then
+            if ((archivediff)); then
                 files=$(in_archive ${file} ${fname})
                 if [[ "$?" -ne "1" ]]; then
                         make_diff ${files} ${file} ${fname}
