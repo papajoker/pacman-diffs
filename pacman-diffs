@@ -38,7 +38,7 @@ function error()
     echo -e "\033[41m${txt[error]}:\033[0m $1" >&2
 }
 function test_sudo() {
-    if ( $EUID != 0 )); then
+    if (( $EUID != 0 )); then
         error "${txt[root]}"
         exit 1
     fi
@@ -183,7 +183,7 @@ function usage()
     echo -e "\n\t -a archive pacnew in /var/cache/pacman/pacnew/"
     echo -e "\t -c compare archives"
     echo -e "\n\t -i pacman history logs"
-    echo -e "\t -j pacman files in cache"
+    echo -e "\t -j list files in cache"
     exit
 }
 
