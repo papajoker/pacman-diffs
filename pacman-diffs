@@ -183,7 +183,7 @@ function usage()
     echo -e "\n\t -a archive pacnew in /var/cache/pacman/pacnew/"
     echo -e "\t -c compare archives"
     echo -e "\n\t -i pacman history logs"
-    echo -e "\t -j list files in cache"
+    echo -e "\t -j list files in pacman history"
     exit
 }
 
